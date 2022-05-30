@@ -1,0 +1,15 @@
+{
+  "name": "day4",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon ."
+  },
+  "dependencies": {
+    "@types/node": "^17.0.35",
+    "kill-port": "^2.0.0",
+    "winston": "^3.7.2"
+  }
+}
