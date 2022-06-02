@@ -100,6 +100,9 @@ export default class BookController
         const data = await bookModel.findAll({
             limit: limit,
         });
+        for (let d of data){
+            d.dataValues.image = "http://localhost:8000/uploads/"+d.dataValues.image;
+        }
         res.json(data);
     }
 }
