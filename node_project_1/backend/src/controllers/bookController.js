@@ -1,15 +1,22 @@
 import bookModel from "../models/bookModel.js";
 import {Op} from"sequelize";
+import textConstants from "../constants/textConstants.js";
+import urlConstants from "../constants/urlConstants.js";
 
 export default class BookController
 {
     //Add Books
     async addBook(req,res,imageName){
-        const data = await bookModel.create({...req.body, image: imageName});
-        console.log(data);
-        if(data){
-            res.json(data);
-        }else res.json({success: false, message: "Error during Adding the book"});
+        try{
+            const data = await bookModel.create({...req.body, image: imageName});
+            console.log(data);
+            if(data){
+                res.json(data);
+            }else res.json({success: false, message: "Error during Adding the book"});
+        }catch(err){
+            res.json({success: false, message:"Error in adding the book."});
+        }
+        
     }
     
     
@@ -21,7 +28,7 @@ export default class BookController
             const data = await bookModel.findByPk(id);
             (data)?res.json(data):res.json({});
         }else{
-            res.json({success: false, message: "Book ID not provided"})
+            res.json({success: false, message: textConstants.BOOK_ID_NOT_PROVIDED})
         }
     }
 
@@ -43,7 +50,7 @@ export default class BookController
                 res.json({success: false, message: "Cannot update book data"});
             }
         }else{
-            res.json({success: false, message: "Book ID not provided"});
+            res.json({success: false, message: textConstants.BOOK_ID_NOT_PROVIDED});
         }
     }
 
@@ -64,7 +71,7 @@ export default class BookController
                 res.json({success: false, message: "Cannot delete book data"});
             }
         }else{
-            res.json({success: false, message: "Book ID not provided"});
+            res.json({success: false, message: textConstants.BOOK_ID_NOT_PROVIDED});
         }
     }
 
@@ -97,12 +104,17 @@ export default class BookController
         let {limit} = req.query;
 
         if(!limit) limit = 20;
-        const data = await bookModel.findAll({
-            limit: limit,
-        });
-        for (let d of data){
-            d.dataValues.image = "http://localhost:8000/uploads/"+d.dataValues.image;
+        try {
+            const data = await bookModel.findAll({
+                limit: parseInt(limit),
+                raw: true,
+            });
+            for (let d of data){
+                d.image = urlConstants.IMAGE_PATH_URL+d.image;
+            }
+            res.json(data);
+        } catch (err) {
+            res.json({success:false, message: err});
         }
-        res.json(data);
     }
 }

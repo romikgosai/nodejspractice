@@ -1,6 +1,8 @@
 import React, {useState} from 'react'
 import "../assets/sass/form.scss"
 import api from "../api/config.js";
+import {ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -15,18 +17,33 @@ const AddBook = () => {
   };
 
   const addBook = async (e) => {
-      e.preventDefault();
-      const response = await api.post("/book/add",{
-          ...formData,
-          image: imageData
-      },
-      {
-          headers: {
-              "Content-Type": "multipart/form-data",
-          }
-      }
-      );
-      console.log(response);
+    e.preventDefault();
+    try {
+        const response = await api.post("/book/add",{
+            ...formData,
+            image: imageData
+        },
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        }
+        );
+        if(response.data.id){
+            console.log(response);
+            toast.success(response.data.message);
+            e.target.reset();
+            setFormData({});
+            setImageData();
+    
+        }else{
+            console.log(response.data.message); 
+            toast.error(response.data.message);
+        }
+    }catch(err){
+        toast.error(err.data.message);
+    }
+    
   };
 
   return (
@@ -37,6 +54,7 @@ const AddBook = () => {
         }}
         onSubmit={addBook}
     >
+        <ToastContainer/>
         <form style={{display:"flex", flexDirection: "column", justifyContent:"center" }}>
         Name
             <input type="text" name="name" onChange={handleChange} />
